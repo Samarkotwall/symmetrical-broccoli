@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e
+
+# Update and install desktop + vnc + novnc
+sudo apt update
+sudo apt install -y lxqt sddm tightvncserver novnc websockify
+
+# Set default VNC password
+mkdir -p ~/.vnc
+echo "123456" | vncpasswd -f > ~/.vnc/passwd
+chmod 600 ~/.vnc/passwd
+
+# Create xstartup script for LXQt
+cat <<EOF > ~/.vnc/xstartup
+#!/bin/bash
+lxqt-session &
+EOF
+chmod +x ~/.vnc/xstartup
+
+# Start VNC and noVNC automatically
+vncserver :1
+websockify --web=/usr/share/novnc/ --wrap-mode=ignore 6080 localhost:5901 &
